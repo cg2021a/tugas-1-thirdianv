@@ -1,8 +1,6 @@
 # tugas-1-thirdianv
 tugas-1-thirdianv created by GitHub Classroom
  
-
- <h3>Pada tugas ini diperintahkan untuk mencari serta mengambil gambar dari benda dengan awalan huruf A, F, atau K.</h3>
  
 Nama benda  : Keyboard
 
