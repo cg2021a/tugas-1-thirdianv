@@ -1,23 +1,29 @@
 import * as THREE from "https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js";
+import { GUI } from "https://threejsfundamentals.org/threejs/../3rdparty/dat.gui.module.js";
 import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js";
 
 function main() {
   const canvas = document.querySelector("#myCanvas");
+
   const renderer = new THREE.WebGLRenderer({ canvas });
 
-  const fov = 100;
+  const fov = 75;
   const aspect = 2; // the canvas default
   const near = 0.1;
-  const far = 100;
+  const far = 50;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.y = 2;
-  camera.position.z = 5;
+  camera.position.y = 10;
+  camera.position.z = 20;
 
   const controls = new OrbitControls(camera, canvas);
-  controls.target.set(0, 0, 0);
+  controls.target.set(-4, 0, 0);
   controls.update();
 
   const scene = new THREE.Scene();
+
+  function updateCamera() {
+    camera.updateProjectionMatrix();
+  }
 
   {
     const color = 0xffffff;
@@ -27,23 +33,38 @@ function main() {
     scene.add(light);
   }
 
-  // const boxWidth = 1;
-  // const boxHeight = 1;
-  // const boxDepth = 1;
-  // const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-  // function createGeo(geometry, color, x) {
-  //   const material = new THREE.MeshPhongMaterial({ color });
+  function makeInstance(geometry, material, x, y, z) {
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
-  //   const cube = new THREE.Mesh(geometry, material);
-  //   scene.add(cube);
+    cube.position.x = x;
+    cube.position.y = y;
+    cube.position.z = z;
 
-  //   cube.position.x = x;
+    return cube;
+  }
+  const loader = new THREE.TextureLoader();
 
-  //   return cube;
-  // }
+  const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(128, {
+    format: THREE.RGBFormat,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter,
+  });
 
-  // createGeo(geometry, 0xfcba03, 0);
+  let sphereCamera = new THREE.CubeCamera(1, 500, cubeRenderTarget);
+  sphereCamera.position.set(0, -5, 0);
+  scene.add(sphereCamera);
+
+  let sphereMaterial = new THREE.MeshBasicMaterial({
+    envMap: sphereCamera.renderTarget,
+  });
+
+  const spheres = [makeInstance(new THREE.SphereGeometry(3, 400, 400), sphereMaterial, -4, 0, 0)];
 
   {
     const loader = new THREE.TextureLoader();
@@ -75,6 +96,7 @@ function main() {
     }
 
     renderer.render(scene, camera);
+    sphereCamera.update(renderer, scene);
 
     requestAnimationFrame(render);
   }
