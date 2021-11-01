@@ -51,6 +51,12 @@ function main() {
   }
 
   {
+    const near = 1;
+    const far = 30;
+    const color = "#636363";
+    scene.fog = new THREE.Fog(color, near, far);
+  }
+  {
     const color = 0xffffff;
     const intensity = 1;
     const light = new THREE.DirectionalLight(color, intensity);
